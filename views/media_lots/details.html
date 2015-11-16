@@ -1,0 +1,108 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<style>
+    ARTICLE { font-family:Verdana, Arial, sans-serif;}
+    ARTICLE H1 {font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif; font-weight:normal; font-size:20pt;}
+    SPAN.ghost {color:#cccccc;}
+    DIV.poster {float:left; padding-right:10pt;}
+    DIV.clear {clear:both;}
+    SPAN.nobr { white-space: nowrap;}
+    UL.episodes { list-style-type:none; }
+</style>
+
+
+<div id="content"></div>
+
+<script type="text/babel">
+window.SeriesBox = React.createClass(
+{
+  render: function()
+  {
+    return (
+        <article className="media_lot title-overview">
+
+        <h1 className="header"><span className="itemprop">Lot Number {this.props.lot_number}</span>
+
+        </h1>
+
+        <div className="txt-block">
+            <h4 className="inline">Recipe:</h4>
+            {this.props.recipe_id}
+        </div>
+
+        <div className="txt-block">
+            <h4 className="inline">Part Number:</h4>
+            {this.props.part_number}
+        </div>
+
+        <h4 className="txt-block">Recipe Parts:</h4>
+        <ul className="episodes">
+        {this.props.recipe_lot_parts.map(function(recipe_lot_part)
+        {
+            return <li key={recipe_lot_part.recipe_lot_part_id}>Component lot number {recipe_lot_part.component_lot_number}</li>;
+        })}
+        </ul>
+
+        </div>
+        </article>
+      );
+  }
+});
+</script>
+<script type="text/javascript">
+var lot_number = LABKEY.ActionURL.getParameter("pk");
+var media_lot = null;
+var recipe_lot_parts = null;
+
+function loadMediaLotsQueryResult(result)
+{
+    media_lots = result.rows[0];
+    try
+    {
+        var date = new Date(titleInfo.released);
+        titleInfo.released = Ext4.util.Format.date(date,"d F Y");
+    }
+    catch (err) {}
+    renderIfReady();
+}
+function loadReciepeLotQueryResult(result)
+{
+    recipe_lot_parts = result.rows;
+    renderIfReady();
+}
+function renderIfReady()
+{
+    if (null == media_lot || null == recipe_lot_parts)
+        return;
+
+    media_lot.recipe_lot_parts = recipe_lot_parts;
+    React.render(React.createElement(SeriesBox,media_lot), $('#content')[0]);
+}
+function onFailure()
+{
+    alert('fail');
+}
+Ext4.onReady(function()
+{
+    if (id)
+    {
+      
+// Extract the Lot info
+        LABKEY.Query.selectRows({
+            schemaName: 'lists',
+            queryName: 'media_lots',
+            columns: '*',
+            filterArray: [LABKEY.Filter.create('lot_number', lot_number)],
+            success: loadMediaLotsQueryResult,
+        });
+        LABKEY.Query.selectRows({
+            schemaName: 'lists',
+            queryName: 'recipe_lot_parts',
+            columns: '*',
+            filterArray: [LABKEY.Filter.create('media_lot_number', lot_number)],
+            success: loadReciepeLotQueryResult,
+        });     
+    }
+});
+</script>

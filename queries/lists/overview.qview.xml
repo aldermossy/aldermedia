@@ -1,0 +1,11 @@
+<customView xmlns="http://labkey.org/data/xml/queryCustomView">
+    <columns>
+        <column name="media_ingredient_id"/>
+        <column name="lot_number"/>
+        <column name="part_number"/>
+        <column name="user_initials"/>
+    </columns>
+    <sorts>
+        <sort column="made_on_date" descending="true"/>
+    </sorts>
+</customView>
