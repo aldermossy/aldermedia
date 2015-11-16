@@ -30,11 +30,11 @@ window.SeriesBox = React.createClass(
         </h1>
         <div className="txt-block">
             <h4 className="inline">Ingredient:</h4>
-            {this.props.media_ingredient.name}
+            {this.props.media_ingredient_id}
         </div>
         <div className="txt-block">
             <h4 className="inline">Recipe:</h4>
-            {this.props.recipe_id||"Component item no reciepe"}
+            {this.props.recipe_id||"Component"}
         </div>
 
         <div className="txt-block">
@@ -62,12 +62,7 @@ var recipe_lot_parts = null;
 function loadMediaLotsQueryResult(result)
 {
     media_lots = result.rows[0];
-    try
-    {
-        var date = new Date(titleInfo.released);
-        titleInfo.released = Ext4.util.Format.date(date,"d F Y");
-    }
-    catch (err) {}
+   
     renderIfReady();
 }
 function loadReciepeLotQueryResult(result)
@@ -105,7 +100,7 @@ Ext4.onReady(function()
             schemaName: 'lists',
             queryName: 'recipe_lot_parts',
             columns: '*',
-            filterArray: [LABKEY.Filter.create('media_lot_number', lot_number, 'IN')],
+            filterArray: [LABKEY.Filter.create('media_lot_number', lot_number)],
             success: loadReciepeLotQueryResult,
         });     
     }
