@@ -10,7 +10,13 @@
     DIV.poster {float:left; padding-right:10pt;}
     DIV.clear {clear:both;}
     SPAN.nobr { white-space: nowrap;}
-    UL.episodes { list-style-type:none; }
+
+    th {  background: 	#E3E6EA;
+          color: 				black;
+          font-weight:  bold;
+          padding-left: 2px;
+         }
+    
 </style>
 
 
@@ -21,10 +27,11 @@
 window.SeriesBox = React.createClass(
   {
   render: function() {
+
     return (
       <div className="media_lot title-overview">
         <h1>Lot Information</h1>
-        <LotInformation  media_lot={this.props.media_lot} />
+        <LotInformation  media_lot={this.props} />
         <RecipeLotParts recipe_lot_parts={this.props.recipe_lot_parts} />
       </div>
     );
@@ -38,19 +45,20 @@ var LotInformation = React.createClass(
   render: function() {
     return (
   <div>
-    <h1 className="header"><span className="itemprop">Lot Number </span></h1>
+    <h1 className="header"><span className="itemprop">Lot Number: {this.props.media_lot.lot_number}</span></h1>
     <div className="txt-block">
         <h4 className="inline">Ingredient:</h4>
-        {this.props.media_ingredient_id}
+     
+        {this.props.media_lot.media_ingredient_id}
     </div>
     <div className="txt-block">
         <h4 className="inline">Recipe:</h4>
-        {this.props.recipe_id||"Component"}
+        {this.props.media_lot.media_recipe_id || 'Component Only no recipe name'}
     </div>
     
     <div className="txt-block">
         <h4 className="inline">Part Number:</h4>
-        {this.props.part_number}
+        {this.props.media_lot.part_number}
     </div>
   </div>
     );
@@ -62,44 +70,69 @@ var RecipeLotParts = React.createClass({
     return (
       <div>
         <h4 className="txt-block">Recipe Parts:</h4>
-        <ul className="episodes">
+        <table className="recipeLotParts">
+        <RecipeLotPartColumnHeaders /> 
         {this.props.recipe_lot_parts.map(function(recipe_lot_part){
-            return <li key={recipe_lot_part.recipe_lot_part_id}>Component lot number {recipe_lot_part.component_lot_number}</li>;
+            return <RecipeLotPartRow key={recipe_lot_part.recipe_lot_part_id} recipe_lot_part={recipe_lot_part} />;
          })
         }
-        </ul>
+        </table>
       </div>
+      );
+  }
+});
+var RecipeLotPartColumnHeaders =  React.createClass({
+  render: function() {
+    return (
+      <tr>
+        <th>Component Lot Number</th>
+        <th>Final Concentration</th>
+        <th>Final Volume</th>
+        <th>Description</th>
+      </tr>
+      );
+  }
+});
+
+var RecipeLotPartRow = React.createClass({
+  render: function() {
+    return (
+      <tr>
+        <td>{this.props.recipe_lot_part.component_lot_number}</td>
+        <td>{this.props.recipe_lot_part.final_concentration}</td>
+        <td>{this.props.recipe_lot_part.final_volume}</td>
+        <td>{this.props.recipe_lot_part.description}</td>
+      </tr>
       );
   }
 });
 
 
 
+
 </script>
 <script type="text/javascript">
 var lot_number = LABKEY.ActionURL.getParameter("pk");
-var media_lots = null;
+var media_lot = null;
 var recipe_lot_parts = null;
 
 function loadMediaLotsQueryResult(result)
 {
-    media_lots = result.rows[0];
-   
+    media_lot = result.rows[0];
+    debugger;
     renderIfReady();
 }
 function loadReciepeLotQueryResult(result)
 {
-  
     recipe_lot_parts = result.rows;
     renderIfReady();
 }
 function renderIfReady()
 {
-    if (null == media_lots || null == recipe_lot_parts)
+    if (null == media_lot || null == recipe_lot_parts)
         return;
-   
-    media_lots.recipe_lot_parts = recipe_lot_parts;
-    React.render(React.createElement(SeriesBox,media_lots), $('#content')[0]);
+    media_lot.recipe_lot_parts = recipe_lot_parts;   
+    React.render(React.createElement(SeriesBox, media_lot), $('#content')[0]);
 }
 function onFailure()
 {
@@ -114,8 +147,8 @@ Ext4.onReady(function()
         LABKEY.Query.selectRows({
             schemaName: 'lists',
             queryName: 'media_lots',
-            columns: '*',
-            filterArray: [LABKEY.Filter.create('lot_number', lot_number)],
+            columns: ['*', 'media_vendor_id/name'],
+            filterArray: [LABKEY.Filter.create('lot_number', lot_number, LABKEY.Filter.Types.EQUAL)],
             success: loadMediaLotsQueryResult,
         });
         LABKEY.Query.selectRows({
@@ -128,7 +161,3 @@ Ext4.onReady(function()
     }
 });
 </script>
-
-
-
-DUDE THE PAGE IS LOADED..
