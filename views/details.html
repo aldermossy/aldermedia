@@ -17,42 +17,64 @@
 <div id="content"></div>
 
 <script type="text/babel">
+
 window.SeriesBox = React.createClass(
-{
-  render: function()
   {
-    debugger;
+  render: function() {
     return (
-        <article className="media_lot title-overview">
+      <div className="media_lot title-overview">
+        <h1>Lot Information</h1>
+        <LotInformation  media_lot={this.props.media_lot} />
+        <RecipeLotParts recipe_lot_parts={this.props.recipe_lot_parts} />
+      </div>
+    );
+  }
+});
 
-        <h1 className="header"><span className="itemprop">Lot Number {this.props.lot_number}</span>
 
-        </h1>
-        <div className="txt-block">
-            <h4 className="inline">Ingredient:</h4>
-            {this.props.media_ingredient_id}
-        </div>
-        <div className="txt-block">
-            <h4 className="inline">Recipe:</h4>
-            {this.props.recipe_id||"Component"}
-        </div>
 
-        <div className="txt-block">
-            <h4 className="inline">Part Number:</h4>
-            {this.props.part_number}
-        </div>
+var LotInformation = React.createClass(
+{
+  render: function() {
+    return (
+  <div>
+    <h1 className="header"><span className="itemprop">Lot Number </span></h1>
+    <div className="txt-block">
+        <h4 className="inline">Ingredient:</h4>
+        {this.props.media_ingredient_id}
+    </div>
+    <div className="txt-block">
+        <h4 className="inline">Recipe:</h4>
+        {this.props.recipe_id||"Component"}
+    </div>
+    
+    <div className="txt-block">
+        <h4 className="inline">Part Number:</h4>
+        {this.props.part_number}
+    </div>
+  </div>
+    );
+  }
+});
 
+var RecipeLotParts = React.createClass({
+  render: function() {
+    return (
+      <div>
         <h4 className="txt-block">Recipe Parts:</h4>
         <ul className="episodes">
-        {this.props.recipe_lot_parts.map(function(recipe_lot_part)
-        {
+        {this.props.recipe_lot_parts.map(function(recipe_lot_part){
             return <li key={recipe_lot_part.recipe_lot_part_id}>Component lot number {recipe_lot_part.component_lot_number}</li>;
-        })}
+         })
+        }
         </ul>
-        </article>
+      </div>
       );
   }
 });
+
+
+
 </script>
 <script type="text/javascript">
 var lot_number = LABKEY.ActionURL.getParameter("pk");
@@ -67,7 +89,7 @@ function loadMediaLotsQueryResult(result)
 }
 function loadReciepeLotQueryResult(result)
 {
-   
+  
     recipe_lot_parts = result.rows;
     renderIfReady();
 }
@@ -100,7 +122,7 @@ Ext4.onReady(function()
             schemaName: 'lists',
             queryName: 'recipe_lot_parts',
             columns: '*',
-            filterArray: [LABKEY.Filter.create('media_lot_number', lot_number)],
+            filterArray: [LABKEY.Filter.create('media_lot_number', lot_number, LABKEY.Filter.Types.EQUAL)],
             success: loadReciepeLotQueryResult,
         });     
     }
@@ -109,4 +131,4 @@ Ext4.onReady(function()
 
 
 
-DUDE THE PAGE IS LOADED.
+DUDE THE PAGE IS LOADED..
