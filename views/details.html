@@ -38,32 +38,45 @@ window.SeriesBox = React.createClass(
   }
 });
 
+var MediaLotHeaders =  React.createClass({
+  render: function() {
+    return (
+      <tr>
+      {this.props.media_lot_display_items.map(function(media_lot_display_item, i){
+          return (<th key={i}>{media_lot_display_item.title }</th>);
+       })
+      }
+      </tr>
+     );
+  }
+});
+
+var MediaLotCell = React.createClass({
+
+  render: function() {
+    return (
+      <td>{this.props.media_lot[this.props.media_lot_display_item.data_method] }</td>
+      );
+  }
+});
 
 
 var LotInformation = React.createClass(
 {
   render: function() {
+
     return (
   <div>
     <h1 className="header"><span className="itemprop">Lot Number: {this.props.media_lot.lot_number}</span></h1>
-    <div className="txt-block">
-        <h4 className="inline">Ingredient:</h4>
-        {this.props.media_lot['media_ingredient_id/name_tag'] }
-    </div>
-    <div className="txt-block">
-        <h4 className="inline">Vendor:</h4>
-        {this.props.media_lot['media_vendor_id/name']}
-    </div>
-
-    <div className="txt-block">
-        <h4 className="inline">Recipe:</h4>
-        {this.props.media_lot.media_recipe_id || 'Component Only no recipe name'}
-    </div>
-    
-    <div className="txt-block">
-        <h4 className="inline">Part Number:</h4>
-        {this.props.media_lot.part_number}
-    </div>
+      <table>
+      <MediaLotHeaders media_lot_display_items={media_lot_display_items} />
+      <tr>
+      {media_lot_display_items.map(function(media_lot_display_item, i){
+          return <MediaLotCell key={i} media_lot_display_item={media_lot_display_item} media_lot={media_lot}/>;
+       })
+      }
+      </tr>
+     </table>
   </div>
     );
   }
@@ -119,11 +132,11 @@ var RecipeLotPartRow = React.createClass({
 var lot_number = LABKEY.ActionURL.getParameter("pk");
 var media_lot = null;
 var recipe_lot_parts = null;
+var media_lot_display_items = lotDisplayInfo();
 
 function loadMediaLotsQueryResult(result)
 {
     media_lot = result.rows[0];
-    debugger;
     renderIfReady();
 }
 function loadReciepeLotQueryResult(result)
@@ -141,6 +154,23 @@ function renderIfReady()
 function onFailure()
 {
     alert('fail');
+}
+
+function lotDisplayInfo() {
+  return [
+          {data_method:'lot_number', title:"Lot number", url_method:'_labkeyurl_lot_number'},
+          {data_method:'part_number', title:"Part number" },
+          {data_method:'made_on_date', title:"Made on date"},
+          {data_method:'expiration_date', title:"Expiration date" },
+          {data_method:'media_ingredient_id/name_tag', title:"Media Ingredient Name", url_method:'_labkeyurl_media_ingredient_id'},
+          {data_method:'media_recipe_id', title:"Media recipe id", url_method:'_labkeyurl_media_recipe_id'},
+          {data_method:'media_vendor_id/name', title:"Media vendor id" },
+          {data_method:'final_volume', title:"Final volume" },
+          {data_method:'user_initials', title:"User initials" },
+          {data_method:'notebook_number', title:"Notebook number" },
+          {data_method:'page_number', title:"Page number" },
+          {data_method:'description', title:"Description" }
+        ];
 }
 Ext4.onReady(function()
 {
