@@ -48,9 +48,13 @@ var LotInformation = React.createClass(
     <h1 className="header"><span className="itemprop">Lot Number: {this.props.media_lot.lot_number}</span></h1>
     <div className="txt-block">
         <h4 className="inline">Ingredient:</h4>
-     
-        {this.props.media_lot.media_ingredient_id}
+        {this.props.media_lot['media_ingredient_id/name_tag'] }
     </div>
+    <div className="txt-block">
+        <h4 className="inline">Vendor:</h4>
+        {this.props.media_lot['media_vendor_id/name']}
+    </div>
+
     <div className="txt-block">
         <h4 className="inline">Recipe:</h4>
         {this.props.media_lot.media_recipe_id || 'Component Only no recipe name'}
@@ -147,7 +151,7 @@ Ext4.onReady(function()
         LABKEY.Query.selectRows({
             schemaName: 'lists',
             queryName: 'media_lots',
-            columns: ['*', 'media_vendor_id/name'],
+            columns: ['*', 'media_vendor_id/name', 'media_recipe_id/recipe_name', 'media_ingredient_id/name_tag'],
             filterArray: [LABKEY.Filter.create('lot_number', lot_number, LABKEY.Filter.Types.EQUAL)],
             success: loadMediaLotsQueryResult,
         });
