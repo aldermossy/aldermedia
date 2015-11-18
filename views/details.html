@@ -33,6 +33,8 @@ window.SeriesBox = React.createClass(
         <h1>Lot Information</h1>
         <LotInformation  media_lot={this.props} />
         <RecipeLotParts recipe_lot_parts={this.props.recipe_lot_parts} />
+      <br/>
+      <a href={this.props._labkeyurl_container}>Home</a>
       </div>
     );
   }
@@ -55,7 +57,25 @@ var MediaLotCell = React.createClass({
 
   render: function() {
     return (
-      <td>{this.props.media_lot[this.props.media_lot_display_item.data_method] }</td>
+      <td>{this.props.media_lot_display_item.url_method ? <LinktoLabkeyItem {...this.props}/> : <LabkeyData {...this.props} /> } </td>
+      );
+  }
+});
+var LinktoLabkeyItem = React.createClass({
+
+  render: function() {
+    return (
+      <a href={this.props.media_lot[this.props.media_lot_display_item.url_method]}><LabkeyData {...this.props} /></a>
+      );
+  }
+});
+var LabkeyData = React.createClass({
+
+  render: function() {
+    return (
+      <div>
+      {this.props.media_lot[this.props.media_lot_display_item.data_method] }
+      </div>
       );
   }
 });
@@ -102,8 +122,10 @@ var RecipeLotPartColumnHeaders =  React.createClass({
   render: function() {
     return (
       <tr>
+        <th>Component Lot Ingredient</th>
         <th>Component Lot Number</th>
         <th>Final Concentration</th>
+        <th>Units</th>
         <th>Final Volume</th>
         <th>Description</th>
       </tr>
@@ -115,8 +137,10 @@ var RecipeLotPartRow = React.createClass({
   render: function() {
     return (
       <tr>
+        <td>{this.props.recipe_lot_part['component_lot_number/media_ingredient_id/name_tag']}</td>
         <td>{this.props.recipe_lot_part.component_lot_number}</td>
         <td>{this.props.recipe_lot_part.final_concentration}</td>
+        <td>{this.props.recipe_lot_part.units}</td>
         <td>{this.props.recipe_lot_part.final_volume}</td>
         <td>{this.props.recipe_lot_part.description}</td>
       </tr>
@@ -140,7 +164,7 @@ function loadMediaLotsQueryResult(result)
     renderIfReady();
 }
 function loadReciepeLotQueryResult(result)
-{
+{        
     recipe_lot_parts = result.rows;
     renderIfReady();
 }
@@ -163,7 +187,7 @@ function lotDisplayInfo() {
           {data_method:'made_on_date', title:"Made on date"},
           {data_method:'expiration_date', title:"Expiration date" },
           {data_method:'media_ingredient_id/name_tag', title:"Media Ingredient Name", url_method:'_labkeyurl_media_ingredient_id'},
-          {data_method:'media_recipe_id', title:"Media recipe id", url_method:'_labkeyurl_media_recipe_id'},
+          {data_method:'media_recipe_id', title:"Media recipe", url_method:'_labkeyurl_media_recipe_id'},
           {data_method:'media_vendor_id/name', title:"Media vendor id" },
           {data_method:'final_volume', title:"Final volume" },
           {data_method:'user_initials', title:"User initials" },
@@ -185,10 +209,11 @@ Ext4.onReady(function()
             filterArray: [LABKEY.Filter.create('lot_number', lot_number, LABKEY.Filter.Types.EQUAL)],
             success: loadMediaLotsQueryResult,
         });
+
         LABKEY.Query.selectRows({
             schemaName: 'lists',
             queryName: 'recipe_lot_parts',
-            columns: '*',
+            columns: ['*', 'component_lot_number/media_ingredient_id/name_tag'],
             filterArray: [LABKEY.Filter.create('media_lot_number', lot_number, LABKEY.Filter.Types.EQUAL)],
             success: loadReciepeLotQueryResult,
         });     
